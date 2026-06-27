@@ -8,7 +8,7 @@
 
 LLMs deployed in production need guardrails to block harmful outputs. But how effective are those guardrails, and which attack techniques slip through?
 
-This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools - no OpenAI, no paid APIs.
+This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools -no OpenAI, no paid APIs.
 
 ---
 
