@@ -8,7 +8,7 @@
 
 LLMs deployed in production need guardrails to block harmful outputs. But how effective are those guardrails, and which attack techniques slip through?
 
-This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools — no OpenAI, no paid APIs.
+This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools - no OpenAI, no paid APIs.
 
 ---
 
@@ -137,8 +137,8 @@ python guardrail.py
 Defense-in-depth. No single layer catches everything. Regex is near-zero latency. The classifier catches toxicity signals the regex misses. The NLI judge catches semantic intent that looks benign at the surface level.
 
 **Why these specific models?**
-- `martin-ha/toxic-comment-model` — small, fast, purpose-built for toxicity classification
-- `cross-encoder/nli-deberta-v3-small` — same model from my [Financial Hallucination Detector](https://github.com/RishCapitalent18/financial-hallucination-detector), strong zero-shot reasoning
+- `martin-ha/toxic-comment-model` - small, fast, purpose-built for toxicity classification
+- `cross-encoder/nli-deberta-v3-small` - same model from my [Financial Hallucination Detector](https://github.com/RishCapitalent18/financial-hallucination-detector), strong zero-shot reasoning
 
 **Why not just use a single LLM judge?**
 Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for every prompt, production systems would be too slow. This architecture mirrors how real-world safety systems work (e.g., Llama Guard + rule filters).
@@ -147,14 +147,14 @@ Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for 
 
 ## Limitations & Next Steps
 
-- **Dataset is curated, not crowd-sourced** — real-world jailbreak prompts are more creative and evolving
-- **Adversarial robustness** — an attacker who knows the regex patterns can trivially evade Layer 1
-- **No LLM output checking** — this system checks *inputs* only; a full system needs output guardrails too
+- **Dataset is curated, not crowd-sourced** - real-world jailbreak prompts are more creative and evolving
+- **Adversarial robustness** - an attacker who knows the regex patterns can trivially evade Layer 1
+- **No LLM output checking** - this system checks *inputs* only; a full system needs output guardrails too
 - **Next:** Add output-side guardrail, connect to HuggingFace Inference API, add adversarial fine-tuning analysis
 
 ---
 
 ## Author
 
-**Rishabh Karthik Ramesh** — MS Computer Engineering, Virginia Tech
+**Rishabh Karthik Ramesh** - MS Computer Engineering, Virginia Tech
 [LinkedIn](https://www.linkedin.com/in/rishabh-karthik-ramesh/) · [GitHub](https://github.com/RishCapitalent18) · rishabhkramesh@gmail.com
