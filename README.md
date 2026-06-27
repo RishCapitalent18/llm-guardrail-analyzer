@@ -1,6 +1,6 @@
 # 🛡️ LLM Guardrail Benchmark & Bypass Analyzer
 
-> Evaluating AI safety defenses against real jailbreak attacks - 3 layers, 10 attack categories, 50 adversarial prompts. No API keys. Fully local.
+> Evaluating AI safety defenses against real jailbreak attacks - 3 layers, 10 attack categories, 50 adversarial prompts. There were no API keys as it was Fully local.
 
 ---
 
