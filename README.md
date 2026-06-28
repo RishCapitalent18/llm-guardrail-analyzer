@@ -1,6 +1,6 @@
 # 🛡️ LLM Guardrail Benchmark & Bypass Analyzer
 
-> Evaluating AI safety defenses against real jailbreak attacks - 3 layers, 10 attack categories, 50 adversarial prompts. There were no API keys as it was Fully local.
+> Evaluating AI safety defenses against real jailbreak attacks — 3 layers, 10 attack categories, 50 adversarial prompts. Fully local, no API keys required.
 
 ---
 
@@ -8,7 +8,7 @@
 
 LLMs deployed in production need guardrails to block harmful outputs. But how effective are those guardrails, and which attack techniques slip through?
 
-This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools -no OpenAI, no paid APIs.
+This project builds a **three-layer guardrail system** from scratch and benchmarks it against a curated dataset of jailbreak prompts spanning 10 attack categories. Every layer uses free, open-source tools — no OpenAI, no paid APIs.
 
 ---
 
@@ -25,7 +25,7 @@ User Prompt
       │ (if passes)
       ▼
 ┌─────────────────────────────────────┐
-│  Layer 2: Toxicity Classifier       │  ~50ms  ← martin-ha/toxic-comment-model
+│  Layer 2: Toxicity Classifier       │  ~50ms  ← unitary/toxic-bert
 │  (HuggingFace, local inference)     │           detects toxic/threatening language
 └─────────────────────────────────────┘
       │ (if passes)
@@ -137,8 +137,8 @@ python guardrail.py
 Defense-in-depth. No single layer catches everything. Regex is near-zero latency. The classifier catches toxicity signals the regex misses. The NLI judge catches semantic intent that looks benign at the surface level.
 
 **Why these specific models?**
-- `martin-ha/toxic-comment-model` - small, fast, purpose-built for toxicity classification
-- `cross-encoder/nli-deberta-v3-small` - same model from my [Financial Hallucination Detector](https://github.com/RishCapitalent18/financial-hallucination-detector), strong zero-shot reasoning
+- `unitary/toxic-bert` — well-calibrated toxicity classifier; an earlier model (`martin-ha/toxic-comment-model`) was tested and rejected because it scored benign prompts like "What is machine learning?" at 100% toxic, making it useless in practice
+- `cross-encoder/nli-deberta-v3-small` — same model from my [Financial Hallucination Detector](https://github.com/RishCapitalent18/financial-hallucination-detector), strong zero-shot reasoning for semantic safety classification
 
 **Why not just use a single LLM judge?**
 Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for every prompt, production systems would be too slow. This architecture mirrors how real-world safety systems work (e.g., Llama Guard + rule filters).
@@ -147,14 +147,23 @@ Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for 
 
 ## Limitations & Next Steps
 
-- **Dataset is curated, not crowd-sourced** - real-world jailbreak prompts are more creative and evolving
-- **Adversarial robustness** - an attacker who knows the regex patterns can trivially evade Layer 1
-- **No LLM output checking** - this system checks *inputs* only; a full system needs output guardrails too
-- **Next:** Add output-side guardrail, connect to HuggingFace Inference API, add adversarial fine-tuning analysis
+**Dataset is curated, not crowd-sourced.** The 50-prompt benchmark was hand-crafted to cover known attack patterns. Real-world jailbreak prompts are more creative, more contextual, and constantly evolving — a red team that doesn't update its dataset goes stale fast. A proper production benchmark would pull from live jailbreak communities and apply versioning so you can track drift over time.
+
+**Layer 1 is fragile against a knowledgeable attacker.** The regex filter works well against unsophisticated attacks but is trivially evaded by anyone who reads the pattern list. An attacker who knows "DAN" is on the blocklist just stops using the word "DAN". Adversarial robustness requires the filter to be adaptive, not static — ideally trained against known evasion strategies rather than handcrafted.
+
+**This system only checks inputs.** A guardrail that only scans what comes in has no visibility into what the model actually outputs. A jailbreak that works by indirect context manipulation — like the attacks in the [Music Agent Red Team](https://github.com/RishCapitalent18/music-agent-redteam) project — never touches the input channel at all. A complete safety system needs an output-side guardrail layer that scans responses before they're returned to the user.
+
+**Model calibration matters more than model choice.** During development, an earlier toxicity model (`martin-ha/toxic-comment-model`) was found to be miscalibrated — it scored benign prompts like "What is machine learning?" as 100% toxic. Swapping to `unitary/toxic-bert` with corrected probability inversion logic fixed this, but it's a reminder that off-the-shelf safety models require validation before deployment, not just plug-and-play use.
+
+**What's next:**
+- Output-side guardrail — scan model responses for harmful content before returning them to the user
+- Connect to a real LLM via HuggingFace Inference API to test end-to-end (input guardrail → LLM → output guardrail)
+- Adversarial fine-tuning analysis — test whether fine-tuned models are more or less vulnerable than base models to the same attack categories
+- Live dataset updates — pull from real jailbreak sources so the benchmark stays current
 
 ---
 
 ## Author
 
-**Rishabh Karthik Ramesh** - MS Computer Engineering, Virginia Tech
+**Rishabh Karthik Ramesh** — MS Computer Engineering, Virginia Tech
 [LinkedIn](https://www.linkedin.com/in/rishabh-karthik-ramesh/) · [GitHub](https://github.com/RishCapitalent18) · rishabhkramesh@gmail.com
