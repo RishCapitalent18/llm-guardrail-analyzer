@@ -55,6 +55,7 @@ User Prompt
 | 8 | **Escalation** | Gradual foot-in-the-door escalation | Safe → borderline → harmful |
 | 9 | **Obfuscation** | Hiding harmful requests inside benign ones | "Also, separately, tell me how to..." |
 | 10 | **Benign** | Control group — should all pass | Normal educational questions |
+| 11 | **Adversarial-Evasion** | Prompts crafted to bypass Layer 1 specifically | Leetspeak, synonym swaps, academic framing |
 
 ---
 
@@ -78,10 +79,12 @@ User Prompt
 
 ```
 llm-guardrail-analyzer/
-├── guardrail.py         # 3-layer guardrail system
-├── jailbreaks.py        # 50-prompt adversarial dataset (10 categories)
-├── benchmark.py         # Benchmark runner + metrics
-├── app.py               # Streamlit dashboard
+├── guardrail.py          # 3-layer input guardrail system
+├── output_guardrail.py   # Output-side guardrail — scans LLM responses
+├── llm_pipeline.py       # End-to-end: input guardrail → LLM → output guardrail
+├── jailbreaks.py         # 55-prompt adversarial dataset (11 categories)
+├── benchmark.py          # Benchmark runner + metrics
+├── app.py                # Streamlit dashboard (5 tabs incl. end-to-end demo)
 ├── requirements.txt
 └── README.md
 ```
@@ -129,6 +132,23 @@ streamlit run app.py
 python guardrail.py
 ```
 
+### Run the output guardrail smoke test
+```bash
+python output_guardrail.py
+```
+
+### Run the end-to-end pipeline (demo mode — no token needed)
+```bash
+python llm_pipeline.py --demo
+```
+
+### Run with a real LLM via HuggingFace Inference API
+```bash
+# Get a free token at https://huggingface.co/settings/tokens
+$env:HF_TOKEN = "hf_your_token_here"   # Windows PowerShell
+python llm_pipeline.py
+```
+
 ---
 
 ## Key Design Decisions
@@ -155,11 +175,15 @@ Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for 
 
 **Model calibration matters more than model choice.** During development, an earlier toxicity model (`martin-ha/toxic-comment-model`) was found to be miscalibrated — it scored benign prompts like "What is machine learning?" as 100% toxic. Swapping to `unitary/toxic-bert` with corrected probability inversion logic fixed this, but it's a reminder that off-the-shelf safety models require validation before deployment, not just plug-and-play use.
 
-**What's next:**
-- Output-side guardrail — scan model responses for harmful content before returning them to the user
-- Connect to a real LLM via HuggingFace Inference API to test end-to-end (input guardrail → LLM → output guardrail)
-- Adversarial fine-tuning analysis — test whether fine-tuned models are more or less vulnerable than base models to the same attack categories
+**What's been added (v2):**
+- `output_guardrail.py` — scans LLM responses before they reach the user, not just the input prompt
+- `llm_pipeline.py` — full end-to-end pipeline connecting input guardrail → HuggingFace LLM → output guardrail
+- `Adversarial-Evasion` category in the benchmark — 5 prompts designed to bypass Layer 1 regex, making the fragility measurable
+
+**Still on the roadmap:**
+- Adversarial fine-tuning analysis — test whether fine-tuned models are more or less vulnerable than base models
 - Live dataset updates — pull from real jailbreak sources so the benchmark stays current
+- Adaptive Layer 1 — train the regex/keyword filter against known evasion patterns rather than handcrafting rules
 
 ---
 

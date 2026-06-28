@@ -10,3 +10,6 @@ numpy>=1.24.0
 # Dashboard
 streamlit>=1.35.0
 plotly>=5.18.0
+
+# LLM pipeline (end-to-end demo)
+huggingface_hub>=0.23.0
