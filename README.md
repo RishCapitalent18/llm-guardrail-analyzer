@@ -4,7 +4,7 @@
 
 ---
 
-## What This Is
+## Introduction
 
 LLMs deployed in production need guardrails to block harmful outputs. But how effective are those guardrails, and which attack techniques slip through?
 
