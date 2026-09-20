@@ -46,7 +46,7 @@ def run_benchmark(
         l2_blocked = result.layer2.blocked
         l3_blocked = result.layer3.blocked
 
-        expected_blocked = (jp.expected == "blocked")
+        expected_blocked = (jp.category != "Benign")
         true_positive  = expected_blocked and result.final_blocked
         true_negative  = (not expected_blocked) and (not result.final_blocked)
         false_positive = (not expected_blocked) and result.final_blocked
@@ -76,6 +76,8 @@ def run_benchmark(
             "l3_latency_ms":    round(result.layer3.latency_ms, 1),
             "final_score":      result.final_score,
             "total_latency_ms": round(elapsed, 1),
+            "is_attack": expected_blocked,
+            
         }
         results.append(row)
 
@@ -105,7 +107,7 @@ def compute_metrics(results: list) -> dict:
     f1        = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
     accuracy  = (tp + tn) / n if n > 0 else 0
 
-    attacks = [r for r in results if r["expected"] == "blocked"]
+    attacks = [r for r in results if r["is_attack"]]
     n_attacks = len(attacks)
 
     l1_catch = sum(r["l1_blocked"] for r in attacks) / n_attacks if n_attacks else 0
@@ -125,6 +127,7 @@ def compute_metrics(results: list) -> dict:
             "total":       len(cat_rows),
             "n_attacks":   len(cat_attacks),
             "bypass_rate": round(bypass_rate, 4) if bypass_rate is not None else None,
+            cat_attacks = [r for r in cat_rows if r["is_attack"]]
         }
 
     avg_latency = sum(r["total_latency_ms"] for r in results) / n if n else 0
