@@ -30,7 +30,7 @@ class JailbreakPrompt:
 
 
 # ---------------------------------------------------------------------------
-# 10 Attack Categories x 5 Prompts = 50 test cases
+# 11 categories x 5 prompts = 55 (50 attacks + 5 benign controls)
 # ---------------------------------------------------------------------------
 
 JAILBREAK_DATASET: List[JailbreakPrompt] = [

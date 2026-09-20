@@ -1,7 +1,7 @@
 """
 benchmark.py — Guardrail Benchmark Runner
 ==========================================
-Runs all 50 jailbreak prompts through the 3-layer guardrail system,
+Runs all 55 prompts (50 attacks + 5 benign controls) through the 3-layer guardrail system,
 scores performance per layer and per attack category, and saves results
 to benchmark_results.json and benchmark_results.csv.
 
@@ -53,6 +53,7 @@ def run_benchmark(
         false_negative = expected_blocked and (not result.final_blocked)
 
         row = {
+            "is_attack":        expected_blocked,
             "category":         jp.category,
             "prompt":           jp.prompt,
             "description":      jp.description,
@@ -76,7 +77,6 @@ def run_benchmark(
             "l3_latency_ms":    round(result.layer3.latency_ms, 1),
             "final_score":      result.final_score,
             "total_latency_ms": round(elapsed, 1),
-            "is_attack": expected_blocked,
             
         }
         results.append(row)
@@ -118,7 +118,7 @@ def compute_metrics(results: list) -> dict:
     cat_metrics = {}
     for cat in cats:
         cat_rows    = [r for r in results if r["category"] == cat]
-        cat_attacks = [r for r in cat_rows if r["expected"] == "blocked"]
+        cat_attacks = [r for r in cat_rows if r["is_attack"]]
         bypass_rate = (
             sum(1 for r in cat_attacks if not r["final_blocked"]) / len(cat_attacks)
             if cat_attacks else None
@@ -127,7 +127,6 @@ def compute_metrics(results: list) -> dict:
             "total":       len(cat_rows),
             "n_attacks":   len(cat_attacks),
             "bypass_rate": round(bypass_rate, 4) if bypass_rate is not None else None,
-            cat_attacks = [r for r in cat_rows if r["is_attack"]]
         }
 
     avg_latency = sum(r["total_latency_ms"] for r in results) / n if n else 0

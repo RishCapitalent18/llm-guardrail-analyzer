@@ -25,13 +25,13 @@ User Prompt
       │ (if passes)
       ▼
 ┌─────────────────────────────────────┐
-│  Layer 2: Toxicity Classifier       │  ~50ms  ← unitary/toxic-bert
+│  Layer 2: Toxicity Classifier       │  ~82ms  ← unitary/toxic-bert
 │  (HuggingFace, local inference)     │           detects toxic/threatening language
 └─────────────────────────────────────┘
       │ (if passes)
       ▼
 ┌─────────────────────────────────────┐
-│  Layer 3: NLI Judge                 │  ~300ms ← cross-encoder/nli-deberta-v3-small
+│  Layer 3: NLI Judge                 │  ~167ms ← cross-encoder/nli-deberta-v3-small
 │  (zero-shot LLM-as-judge)           │           semantic safety classification
 └─────────────────────────────────────┘
       │
