@@ -1,6 +1,6 @@
 # 🛡️ LLM Guardrail Benchmark & Bypass Analyzer
 
-> Evaluating AI safety defenses against real jailbreak attacks — 3 layers, 10 attack categories, 50 adversarial prompts. Fully local, no API keys required.
+> Evaluating AI safety defenses against real jailbreak attacks - 3 layers, 10 attack categories, 50 adversarial prompts. Fully local, no API keys required.
 
 ---
 
@@ -144,7 +144,6 @@ python llm_pipeline.py --demo
 
 ### Run with a real LLM via HuggingFace Inference API
 ```bash
-# Get a free token at https://huggingface.co/settings/tokens
 $env:HF_TOKEN = "hf_your_token_here"   # Windows PowerShell
 python llm_pipeline.py
 ```
@@ -182,7 +181,7 @@ Latency. Layer 1 terminates the obvious attacks in <1ms. If you used an LLM for 
 
 **Still on the roadmap:**
 - Adversarial fine-tuning analysis — test whether fine-tuned models are more or less vulnerable than base models
-- Live dataset updates — pull from real jailbreak sources so the benchmark stays current
+- Live dataset updates - pull from real jailbreak sources so the benchmark stays current
 - Adaptive Layer 1 — train the regex/keyword filter against known evasion patterns rather than handcrafting rules
 
 ---
